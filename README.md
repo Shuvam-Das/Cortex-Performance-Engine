@@ -16,9 +16,9 @@ The system is containerized using Docker, making it portable and easy to run.
   - **Pacing**: Employs a `ConstantThroughputTimer` to precisely control the load.
   - **Think Time**: Simulates realistic user pauses.
 - **Multi-Environment Targeting**: Analyzes logs from a production environment to safely execute tests against a configured **Staging**, **UAT**, or **local** environment.
-- **Self-Healing Pipeline**: The central `Orchestrator` agent can detect failures in the pipeline (e.g., invalid logs, script errors) and attempt to recover or use fallback strategies.
 - **Self-Training Capabilities**: Agents record their successes and failures to a shared **Knowledge Base**. This allows the system to learn from past mistakes, for example, by trying a different log parser if the default one fails.
-- **Fully Containerized**: All agents are isolated in Docker containers and managed by Docker Compose for easy setup and execution.
+- **Fully Containerized**: All agents and the n8n orchestrator are isolated in Docker containers and managed by Docker Compose.
+- **Intelligent Reporting**: Automatically generates a detailed Markdown report with critical issues, observations, and actionable recommendations.
 
 ---
 
@@ -87,7 +87,6 @@ Once the pipeline completes, all generated artifacts, including the final report
 - **Test Script**: `shared-artifacts/jmeter-scripts/generated_test.jmx`
 - **Test Report**: `shared-artifacts/test-results/final_report.txt`
 - **Knowledge Base**: `shared-artifacts/knowledge_base.json`
-- **Permanent Archive**: `run_archive/<timestamp>/` (contains all artifacts for a specific run)
 
 ---
 

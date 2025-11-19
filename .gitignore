@@ -29,3 +29,6 @@ node_modules/
 # Keep the dummy log file and the directory structure
 !/shared-artifacts/production-logs/dummy-log.log
 !/shared-artifacts/knowledge_base.json
+
+# n8n local data
+/n8n-data/
