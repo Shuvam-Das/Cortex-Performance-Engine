@@ -14,17 +14,19 @@ If you have an idea for a new feature or an improvement to an existing one, feel
 
 ### Pull Requests
 
-We welcome pull requests! Here is the basic process:
+We welcome pull requests! As this is a personally managed project, the project owner reserves the right to accept or reject contributions. To increase the chances of your PR being accepted, please follow these steps:
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/AmazingFeature`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'feat: Add some AmazingFeature'`).
-5. Push to the branch (`git push origin feature/AmazingFeature`).
-6. Open a new Pull Request.
+1. **Open an Issue First**: Before starting any significant work, please open an issue to discuss your proposed changes. This ensures that your contribution aligns with the project's goals.
+2. **Fork the Repository**: Create your own copy of the project to work on.
+3. **Create a New Branch**: (`git checkout -b feature/AmazingFeature`).
+4. **Make Your Changes**: Ensure your code adheres to the existing style.
+5. **Test Your Changes**: Make sure your changes do not break any existing functionality.
+6. **Commit Your Changes**: (`git commit -m 'feat: Add some AmazingFeature'`).
+7. **Push to the Branch**: (`git push origin feature/AmazingFeature`).
+8. **Open a Pull Request**: Reference the issue you opened in step 1.
 
 Please make sure your code adheres to the existing style and that you have tested your changes.
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code. (Note: A `CODE_OF_CONDUCT.md` file would need to be created for this link to work).
+This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code.
