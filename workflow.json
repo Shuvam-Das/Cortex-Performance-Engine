@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {},
-      "name": "Trigger via Postman",
+      "name": "Trigger via API (Postman)",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [
@@ -167,17 +167,6 @@
         [
           {
             "node": "6. Archivist",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "6. Archivist": {
-      "main": [
-        [
-          {
-            "node": "Success Notification",
             "type": "main",
             "index": 0
           }
