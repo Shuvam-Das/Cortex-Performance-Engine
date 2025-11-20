@@ -1,107 +1,59 @@
-# Agentic Performance Testing System
+# Agentic Performance Testing System (Production-Ready on AWS)
 
 [![CodeQL](https://github.com/YOUR_USERNAME/YOUR_REPONAME/actions/workflows/codeql.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPONAME/actions/workflows/codeql.yml) [![Super-Linter](https://github.com/YOUR_USERNAME/YOUR_REPONAME/actions/workflows/linter.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPONAME/actions/workflows/linter.yml) [![Trivy Scan](https://github.com/YOUR_USERNAME/YOUR_REPONAME/actions/workflows/trivy.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPONAME/actions/workflows/trivy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This project is a sophisticated, multi-agent system designed to fully automate the performance testing lifecycle. It uses **n8n** for visual workflow orchestration, allowing for powerful, flexible, and easy-to-understand test pipelines.
+This project is a sophisticated, multi-agent system designed to fully automate the performance testing lifecycle. It is architected to be **production-ready, cost-optimized, and fully automated on AWS**, requiring zero manual intervention.
 
-The system is containerized using Docker, making it portable and easy to run.
-
----
-
-## ✨ Key Features
-
-- **Visual Orchestration with n8n**: Replaces a rigid script-based orchestrator with a flexible, visual n8n workflow, enabling advanced error handling, branching, and easier integration with tools like Slack and Jira.
-- **Automated Production Log Analysis**: Ingests historical production logs to calculate baseline performance metrics.
-- **Dynamic Workload Modeling**: Translates production metrics into a mathematical workload model.
-- **Automatic Archiving & Versioning**: Every test run's artifacts (reports, scripts, models) are automatically archived in a timestamped folder and committed to Git, creating a historical "memory" for future analysis and self-training.
-- **Advanced JMeter Script Generation**: Automatically creates complex JMeter (`.jmx`) test scripts with features that normally require manual effort:
-  - **Correlation**: Handles dynamic values like session tokens.
-  - **Parameterization**: Uses external CSV data for realistic inputs (e.g., usernames, passwords).
-  - **Pacing**: Employs a `ConstantThroughputTimer` to precisely control the load.
-  - **Think Time**: Simulates realistic user pauses.
-- **Multi-Environment Targeting**: Analyzes logs from a production environment to safely execute tests against a configured **Staging**, **UAT**, or **local** environment.
-- **Self-Training Capabilities**: Agents record their successes and failures to a shared **Knowledge Base**. This allows the system to learn from past mistakes, for example, by trying a different log parser if the default one fails.
-- **Fully Containerized**: All agents and the n8n orchestrator are isolated in Docker containers and managed by Docker Compose.
-- **Intelligent Reporting**: Automatically generates a detailed Markdown report with critical issues, observations, and actionable recommendations.
+The system is deployed via a CI/CD pipeline and runs on a serverless architecture.
 
 ---
 
-## ⚙️ Prerequisites
+## ✨ Production-Ready AWS Architecture
 
-Before you begin, ensure you have the following installed on your system:
-
-- **Docker**: Download Docker Desktop (for Mac/Windows) or install Docker Engine for Linux.
-- **Docker Compose**: Included with Docker Desktop. For Linux, install the `docker-compose-plugin`.
-
-Verify your installation by running `docker --version` and `docker-compose --version`.
+- **Automated CI/CD Pipeline**: A **GitHub Actions** workflow automatically builds, tests, and deploys the entire application to AWS on every push to the `main` branch.
+- **Infrastructure as Code (IaC)**: The entire cloud infrastructure is defined using the **AWS CDK**, ensuring repeatable and version-controlled deployments.
+- **Serverless & Cost-Optimized**: The application runs on a serverless stack (**Step Functions**, **Lambda**, **Fargate Spot**) to ensure you only pay for what you use, keeping costs extremely low.
+- **Zero Manual Intervention**: An **Amazon EventBridge** rule automatically triggers the pipeline on a schedule (e.g., daily), making the system fully autonomous.
+- **Live Observability**:
+  - **Live Logs**: All application and agent logs are streamed in real-time to **Amazon CloudWatch**.
+  - **Live Status**: The **AWS Step Functions** console provides a live, visual graph of the pipeline's execution status.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Automated Deployment & Monitoring
 
-### 1. Configuration
+This project is no longer deployed manually. The deployment is fully automated.
 
-**a. Place Production Logs:**
-Place your historical application logs into the `shared-artifacts/production-logs/` directory. A `dummy-log.log` is included as an example.
+### 1. Deployment
 
-**b. Define Target Environments:**
-Open the `config.json` file in the root directory. This file defines the servers your tests will run against. Modify the `staging`, `uat`, or `local` environments to match your infrastructure.
+Simply push a commit to the `main` branch of this repository. The GitHub Actions pipeline defined in `.github/workflows/deploy.yml` will handle the rest. It will:
+1.  Build and push the necessary Docker images to Amazon ECR.
+2.  Execute the AWS CDK script to provision or update all cloud resources.
 
-```json
-{
-  "environments": {
-    "staging": {
-      "protocol": "https",
-      "domain": "api.staging.yourapp.com",
-      "port": 443
-    },
-    "local": {
-      "protocol": "http",
-      "domain": "host.docker.internal",
-      "port": 8080
-    }
-  }
-}
-```
+### 2. Monitoring the Live Application
 
-**c. Select the Target Environment:**
-Open the `docker-compose.yml` file. Find the `orchestrator` service and set the `TARGET_ENVIRONMENT` variable to the environment you want to test (e.g., `staging`, `uat`, or `local`).
+Once deployed, you can monitor the application in the AWS Management Console:
 
-```yaml
-services:
-  orchestrator:
-    environment:
-      - TARGET_ENVIRONMENT=staging # <-- Change this value
-      - WORKLOAD_INCREASE_PERCENTAGE=50 
-```
+#### a) Live Process Status
+1.  Navigate to the **AWS Step Functions** service.
+2.  Click on the `PerformanceTestingStateMachine`.
+3.  You will see a list of executions. Click on the latest one to view a real-time, visual graph of the pipeline. You can see which agent is running, what its inputs/outputs are, and diagnose any errors.
 
-### 2. Launch the Pipeline
-
-Open a terminal in the root directory of the project and run the following command:
-
-```bash
-docker-compose up --build orchestrator
-```
-
-This command will build all the agent images and start the `Orchestrator`, which will then execute the entire pipeline step-by-step.
-
-### 3. View the Results
-
-Once the pipeline completes, all generated artifacts, including the final report, can be found in the `shared-artifacts/` directory.
-- **Test Script**: `shared-artifacts/jmeter-scripts/generated_test.jmx`
-- **Test Report**: `shared-artifacts/test-results/final_report.txt`
-- **Knowledge Base**: `shared-artifacts/knowledge_base.json`
+#### b) Live Application Logs
+1.  Navigate to the **Amazon CloudWatch** service.
+2.  In the left menu, click on **Log groups**.
+3.  You will see log groups for each Lambda function (e.g., `/aws/lambda/LogAnalyzerAgent`) and for the Fargate task. Click on any log group to view and search the live log streams.
 
 ---
 
 ## 🤖 The Agents
 
-The system is composed of six specialized agents that work in sequence:
+The system is composed of specialized agents orchestrated by **AWS Step Functions**:
 
-1.  **Log Analyzer**: Parses production logs to establish a performance baseline.
-2.  **Workload Modeler**: Creates a rich test plan based on the baseline and user requirements.
-3.  **Script Generator**: Builds an advanced JMeter script tailored to the target environment.
-4.  **Test Executor**: Performs a sanity check on the script and then executes the full performance test.
-5.  **Report Synthesizer**: Generates a summary report from the raw test results.
-6.  **Orchestrator & Healer**: The master agent that controls the pipeline, manages failures, and makes healing decisions based on the shared knowledge base.
+1.  **Log Analyzer (Lambda)**: Parses production logs from S3.
+2.  **Workload Modeler (Lambda)**: Creates a test plan from the baseline analysis.
+3.  **Script Generator (Lambda)**: Builds an advanced JMeter script.
+4.  **Test Executor (Fargate Task)**: Executes the JMeter performance test at scale.
+5.  **Report Synthesizer (Lambda)**: Generates an intelligent report from the test results.
+6.  **Archivist (Lambda)**: Commits all run artifacts to a versioned archive in S3.
