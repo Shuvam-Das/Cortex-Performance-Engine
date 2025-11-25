@@ -124,6 +124,20 @@ slides_content = [
         "notes": "Return on Investment (ROI): By finding performance and resilience issues earlier, we reduce the risk of costly production outages and improve customer satisfaction."
     },
     {
+        "title": "Advanced Features: The Future is Autonomous",
+        "subtitle": "Evolving from automation to a truly intelligent, self-learning system.",
+        "points": [
+            {"text": "For the Performance Tester: Effortless Test Creation", "bold": True, "level": 0},
+            {"text": "Agentic Test Data Generation: AI automatically creates realistic test data (e.g., user profiles, product catalogs).", "level": 1},
+            {"text": "For the Performance Engineer: Deep Diagnostics", "bold": True, "level": 0},
+            {"text": "Automated Profiling & Root Cause Analysis: Agent automatically attaches profilers to pinpoint slow code during tests.", "level": 1},
+            {"text": "For the Performance Architect: Proactive Optimization", "bold": True, "level": 0},
+            {"text": "AI-Driven Cost & Capacity Advisor: Agent analyzes trends to recommend cost-saving infrastructure changes with no performance impact.", "level": 1},
+            {"text": "Automated Architecture Resilience Validation: Agent reads IaC templates to design and run targeted chaos experiments.", "level": 1}
+        ],
+        "notes": "This slide outlines the roadmap for making the platform truly 'smart,' moving beyond simple automation to predictive and proactive capabilities."
+    },
+    {
         "title": "Prerequisites & Next Steps",
         "points": [
             {"text": "Prerequisites:", "bold": True, "level": 0},

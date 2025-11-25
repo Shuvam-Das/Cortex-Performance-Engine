@@ -1,59 +1,40 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-import time
-import random
-import logging
-from pythonjsonlogger import jsonlogger
+import React, { useState, useEffect } from 'react';
 
-# --- Structured Logging Setup ---
-logger = logging.getLogger()
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter('%(asctime)s %(name)s %(levelname)s %(message)s')
-logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
-logger.setLevel(logging.INFO)
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-app = FastAPI()
+function App() {
+  const [products, setProducts] = useState([]);
 
-class Product(BaseModel):
-    id: int
-    name: string
-    price: float
+  useEffect(() => {
+    // Fetch products when the component mounts
+    fetch(`${API_URL}/api/products`)
+      .then(res => res.json())
+      .then(data => setProducts(data))
+      .catch(err => console.error("Failed to fetch products:", err));
+  }, []);
 
-class CartItem(BaseModel):
-    product_id: int
-    quantity: int
+  const handleSearch = () => {
+    // Simulate a user searching for a product
+    fetch(`${API_URL}/api/products/search?query=top`)
+      .then(res => res.json())
+      .then(data => console.log("Search results:", data));
+  };
 
-@app.get("/")
-def read_root():
-    logger.info("Root endpoint was accessed.")
-    return {"message": "Welcome to the E-Commerce API"}
+  const handleOrder = () => {
+    // Simulate a user placing an order
+    fetch(`${API_URL}/api/orders`, { method: 'POST', body: JSON.stringify({ productId: 1, quantity: 1 }), headers: {'Content-Type': 'application/json'} })
+      .then(res => res.json())
+      .then(data => console.log("Order successful:", data));
+  };
 
-@app.get("/products/{product_id}")
-def get_product(product_id: int):
-    # Simulate a database lookup
-    time.sleep(random.uniform(0.05, 0.2))
-    if product_id > 1000:
-        logger.warning(f"Product lookup for non-existent ID: {product_id}")
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    logger.info(f"Product {product_id} was retrieved successfully.")
-    return {"product_id": product_id, "name": f"Product Name {product_id}", "price": round(random.uniform(10.0, 100.0), 2)}
+  return (
+    <div>
+      <h1>E-Commerce Store</h1>
+      <button onClick={handleSearch}>Search for "top"</button>
+      <button onClick={handleOrder}>Place Order</button>
+      <ul>{products.map(p => <li key={p.id}>{p.name} - ${p.price}</li>)}</ul>
+    </div>
+  );
+}
 
-@app.post("/cart")
-def add_to_cart(item: CartItem):
-    # Simulate adding to a cart, which might be slower
-    time.sleep(random.uniform(0.1, 0.4))
-    logger.info(f"Added {item.quantity} of product {item.product_id} to cart.")
-    return {"status": "success", "item_added": item}
-
-@app.post("/checkout")
-def checkout():
-    # Simulate a slow checkout process that sometimes fails
-    time.sleep(random.uniform(0.3, 1.0))
-    if random.random() < 0.1: # 10% chance of failure
-        logger.error("Checkout failed due to a simulated payment gateway error.")
-        raise HTTPException(status_code=500, detail="Payment gateway error")
-
-    logger.info("Checkout process completed successfully.")
-    return {"status": "checkout_successful"}
+export default App;

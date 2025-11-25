@@ -15,7 +15,7 @@ export class EcommerceWebAppStack extends cdk.Stack {
     const backendLambda = new lambda.Function(this, 'BackendHandler', {
       runtime: lambda.Runtime.PYTHON_3_9,
       code: lambda.Code.fromAsset('../backend'),
-      handler: 'main.app', // Assuming you use a Lambda adapter like Mangum
+      handler: 'main.handler', // Using a Lambda adapter like Mangum
       timeout: cdk.Duration.seconds(30),
     });
 
