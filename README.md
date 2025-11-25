@@ -16,6 +16,7 @@ A fully functional online store designed for cloud-native deployment. It is buil
 -   **Frontend**: A responsive user interface built with **React**.
 -   **Backend**: A scalable API built with **Python (FastAPI)**.
 -   **Deployment**: Fully automated via the AWS CDK, deploying to a serverless stack (API Gateway, Lambda, S3, CloudFront) with production-ready caching and security policies.
+-   **Static Endpoint**: The application is accessed via a permanent, static domain name provided by **Amazon CloudFront**.
 
 ---
 
@@ -31,12 +32,20 @@ An intelligent, agentic system for ensuring the resilience and performance of an
 -   **AI-Powered Reporting (Amazon Bedrock)**: The `ReportSynthesizer` agent uses Bedrock to analyze test results and server-side metrics, acting as an expert performance engineer to write reports with root cause analysis and actionable recommendations.
 -   **Chaos Engineering**: Injects failures (e.g., CPU stress, latency, errors) into the live AWS environment to test system resilience, orchestrated via **AWS Systems Manager**.
 -   **Secure, Extensible Notifications (n8n on Fargate)**: A final workflow step calls a webhook on your **private, self-hosted n8n instance** to create Jira tickets, send rich Slack messages, or log results to external systems.
+-   **Static Endpoint**: The platform is triggered via a permanent, static endpoint provided by an **Application Load Balancer** fronting the n8n service.
 -   **Serverless Container Orchestration (AWS Fargate)**: All containerized components (n8n, JMeter) run on AWS Fargate, eliminating the need to manage servers, clusters, or nodes. This is a deliberate choice over Kubernetes to reduce operational overhead and cost.
 -   **Serverless & Cost-Optimized**: The entire platform runs on **AWS Step Functions**, **Lambda**, and **Fargate Spot**, ensuring minimal cost.
 
 ---
 
 ## 🚀 Automated AWS Deployment (CI/CD)
+
+This project is designed to be deployed on a strict budget (under $100 for the prototype phase) without sacrificing features. This is achieved by:
+-   Using **serverless services** (Lambda, S3, Step Functions) which only incur costs on-demand.
+-   Leveraging **AWS Fargate Spot** for JMeter tasks, saving up to 90% on compute costs.
+-   Configuring the **n8n Fargate service** with minimal resources and placing it in a public subnet to avoid the high cost of a NAT Gateway.
+
+---
 
 Both applications are designed to be deployed automatically via a CI/CD pipeline (e.g., GitHub Actions) using the **AWS CDK** stacks located in their respective `iac/` directories.
 
