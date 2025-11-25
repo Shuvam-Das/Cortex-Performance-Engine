@@ -131,7 +131,7 @@ slides_content = [
             {"text": "AI-Powered Script Generation: Bedrock generates complete JMX scripts from natural language and log data.", "level": 1},
             {"text": "AI-Powered Reporting: Bedrock acts as an expert performance engineer to analyze results and write actionable recommendations.", "level": 1},
             {"text": "n8n (The Integrator):", "bold": True, "level": 0},
-            {"text": "A final step in the workflow calls an n8n webhook for notifications and integrations.", "level": 1},
+            {"text": "A self-hosted n8n instance on AWS Fargate is called via webhook for secure, extensible integrations.", "level": 1},
             {"text": "Automatically create Jira tickets for failures, send rich Slack messages, and log results to Google Sheets.", "level": 2}
         ],
         "notes": "This slide details the integration of advanced services that make the platform truly intelligent and adaptive."
