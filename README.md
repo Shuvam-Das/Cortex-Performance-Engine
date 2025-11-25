@@ -31,6 +31,7 @@ An intelligent, agentic system for ensuring the resilience and performance of an
 -   **AI-Powered Reporting (Amazon Bedrock)**: The `ReportSynthesizer` agent uses Bedrock to analyze test results and server-side metrics, acting as an expert performance engineer to write reports with root cause analysis and actionable recommendations.
 -   **Chaos Engineering**: Injects failures (e.g., CPU stress, latency, errors) into the live AWS environment to test system resilience, orchestrated via **AWS Systems Manager**.
 -   **Secure, Extensible Notifications (n8n on Fargate)**: A final workflow step calls a webhook on your **private, self-hosted n8n instance** to create Jira tickets, send rich Slack messages, or log results to external systems.
+-   **Serverless Container Orchestration (AWS Fargate)**: All containerized components (n8n, JMeter) run on AWS Fargate, eliminating the need to manage servers, clusters, or nodes. This is a deliberate choice over Kubernetes to reduce operational overhead and cost.
 -   **Serverless & Cost-Optimized**: The entire platform runs on **AWS Step Functions**, **Lambda**, and **Fargate Spot**, ensuring minimal cost.
 
 ---
@@ -44,7 +45,7 @@ Both applications are designed to be deployed automatically via a CI/CD pipeline
 1.  **Configure AWS Credentials** for your CI/CD environment.
 2.  **Bootstrap AWS CDK** in your target AWS account and region.
 3.  **Push to the `main` branch**: A CI/CD pipeline should be configured to automatically:
-    -   Build and push any necessary container images to **Amazon ECR**.
+    -   Build the Dockerfiles (`test-executor`, `ecommerce-webapp/frontend`, `ecommerce-webapp/backend`) and push the images to **Amazon ECR**.
     -   Deploy the `ecommerce-webapp` stack.
     -   Deploy the `performance-platform` stack.
 
