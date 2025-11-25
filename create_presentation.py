@@ -124,6 +124,19 @@ slides_content = [
         "notes": "Return on Investment (ROI): By finding performance and resilience issues earlier, we reduce the risk of costly production outages and improve customer satisfaction."
     },
     {
+        "title": "Advanced Architecture: Integrating Bedrock & n8n",
+        "subtitle": "Evolving the platform with Generative AI and extensible workflow automation.",
+        "points": [
+            {"text": "Amazon Bedrock (The Brain):", "bold": True, "level": 0},
+            {"text": "AI-Powered Script Generation: Bedrock generates complete JMX scripts from natural language and log data.", "level": 1},
+            {"text": "AI-Powered Reporting: Bedrock acts as an expert performance engineer to analyze results and write actionable recommendations.", "level": 1},
+            {"text": "n8n (The Integrator):", "bold": True, "level": 0},
+            {"text": "A final step in the workflow calls an n8n webhook for notifications and integrations.", "level": 1},
+            {"text": "Automatically create Jira tickets for failures, send rich Slack messages, and log results to Google Sheets.", "level": 2}
+        ],
+        "notes": "This slide details the integration of advanced services that make the platform truly intelligent and adaptive."
+    },
+    {
         "title": "Advanced Features: The Future is Autonomous",
         "subtitle": "Evolving from automation to a truly intelligent, self-learning system.",
         "points": [
