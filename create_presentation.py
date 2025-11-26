@@ -21,7 +21,7 @@ COLOR_ARROW = RGBColor(191, 144, 0) # Gold
 slides_content = [
     {
         "title": "Cortex Performance Engine",
-        "subtitle": "An Intelligent, Agentic Resilience & Performance Platform on AWS",
+        "subtitle": "An Intelligent, Agentic Resilience & Performance Platform on AWS\n\nStakeholder Showcase: December 5th",
         "notes": "The title slide sets the stage for the entire presentation. It should be clean, professional, and clearly state the project's name and its high-level purpose."
     },
     {
@@ -29,7 +29,7 @@ slides_content = [
         "points": [
             {"text": "The Problem:", "bold": True, "level": 0, "end_para": " Our current performance testing is slow, manual, and costly, creating a bottleneck for innovation and leaving us vulnerable to production failures."},
             {"text": "The Solution:", "bold": True, "level": 0, "end_para": " The Cortex Performance Engine is a serverless, AI-driven platform that automates the entire resilience engineering lifecycle, from test creation to root cause analysis."},
-            {"text": "The Ask:", "bold": True, "level": 0, "end_para": " We seek approval to deploy the prototype and integrate it with our primary e-commerce application to validate its business impact."},
+            {"text": "The Ask:", "bold": True, "level": 0, "end_para": " We seek approval to proceed with the prototype deployment for a stakeholder showcase on December 5th."},
             {"text": "The ROI:", "bold": True, "level": 0, "end_para": " We project a 90%+ reduction in testing infrastructure costs and a 95%+ reduction in manual effort, enabling faster delivery and more resilient applications."}
         ],
         "notes": "This slide is crucial for stakeholders. It immediately answers 'What is this about and why should I care?'"
@@ -170,11 +170,11 @@ slides_content = [
     {
         "title": "Roadmap & Next Steps",
         "points": [
-            {"text": "Phase 1: Deploy & Validate (This Quarter)", "bold": True, "level": 0},
-            {"text": "Deploy the Cortex Engine prototype to AWS.", "level": 1},
-            {"text": "Integrate with the e-commerce application.", "level": 1},
-            {"text": "Execute baseline tests and validate cost savings and performance metrics.", "level": 1},
-            {"text": "Phase 2: Enhance & Expand (Next Quarter)", "bold": True, "level": 0},
+            {"text": "Phase 1: Prototype Showcase (Target: December 5th)", "bold": True, "level": 0},
+            {"text": "Finalize prototype deployment to the AWS environment.", "level": 1},
+            {"text": "Complete integration with the e-commerce application for end-to-end testing.", "level": 1},
+            {"text": "Prepare live demonstration script and validate baseline metrics for comparison.", "level": 1},
+            {"text": "Phase 2: Pilot Program (Q1 Next Year)", "bold": True, "level": 0},
             {"text": "Onboard additional development teams.", "level": 1},
             {"text": "Enhance the AI reporting agent with more advanced diagnostics.", "level": 1},
             {"text": "Phase 3: Autonomous Operation (Future)", "bold": True, "level": 0},
