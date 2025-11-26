@@ -73,24 +73,42 @@ slides_content = [
         "notes": "This slide clearly articulates the four key pillars of the solution."
     },
     {
-        "title": "Architecture Diagram: How It Works",
+        "title": "Detailed Architecture: Cortex Engine & Target Application",
         "is_diagram": True,
         "diagram_elements": [
-            {"text": "User", "x": 0.5, "y": 3, "w": 1.5, "h": 1},
-            {"text": "->", "x": 2, "y": 3.25, "w": 0.5, "h": 0.5},
-            {"text": "AWS Lex\n(Chatbot Interface)", "x": 2.5, "y": 3, "w": 2, "h": 1},
-            {"text": "->", "x": 4.5, "y": 3.25, "w": 0.5, "h": 0.5},
-            {"text": "AWS Step Functions\n(Orchestrator)", "x": 5, "y": 2, "w": 3, "h": 3},
-            {"text": "->", "x": 8, "y": 3.25, "w": 0.5, "h": 0.5},
-            {"text": "Agentic Core", "x": 8.5, "y": 1.5, "w": 4, "h": 4, "is_group": True},
-            {"text": "Log Analyzer (Lambda)", "x": 9, "y": 2, "w": 3, "h": 0.75},
-            {"text": "Script Generator (Bedrock)", "x": 9, "y": 2.75, "w": 3, "h": 0.75},
-            {"text": "Test Executor (Fargate Spot)", "x": 9, "y": 3.5, "w": 3, "h": 0.75},
-            {"text": "Report Synthesizer (Bedrock)", "x": 9, "y": 4.25, "w": 3, "h": 0.75},
-            {"text": "->", "x": 12.5, "y": 3.25, "w": 0.5, "h": 0.5},
-            {"text": "n8n on Fargate\n(Notifications & Jira)", "x": 13, "y": 3, "w": 2.5, "h": 1},
+            # --- Groups ---
+            {"text": "User & CI/CD", "x": 0.5, "y": 1.5, "w": 15, "h": 1.5, "is_group": True, "font_size": 12},
+            {"text": "Cortex Performance Engine", "x": 0.5, "y": 3.25, "w": 7, "h": 4.5, "is_group": True, "font_size": 12},
+            {"text": "Target Application: E-Commerce Web App", "x": 8.5, "y": 3.25, "w": 7, "h": 4.5, "is_group": True, "font_size": 12},
+            
+            # --- User & CI/CD Zone ---
+            {"text": "User", "x": 1, "y": 2, "w": 1, "h": 0.75},
+            {"text": "GitHub Actions\n(CI/CD Pipeline)", "x": 13, "y": 2, "w": 2, "h": 0.75},
+            {"text": "1. User initiates test", "x": 2.2, "y": 2.15, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
+
+            # --- Cortex Performance Engine Zone ---
+            {"text": "AWS Lex\n(Chatbot)", "x": 4, "y": 2, "w": 1.5, "h": 0.75},
+            {"text": "AWS Step Functions\n(Orchestrator)", "x": 1, "y": 4, "w": 2.5, "h": 1},
+            {"text": "2. Orchestrates Agents", "x": 2, "y": 5.25, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
+            {"text": "Agent: Log Analyzer\n(Lambda)", "x": 4, "y": 3.75, "w": 3, "h": 0.75},
+            {"text": "Agent: Script Generator\n(Bedrock)", "x": 4, "y": 4.5, "w": 3, "h": 0.75},
+            {"text": "Agent: Test Executor\n(Fargate Spot + JMeter)", "x": 4, "y": 5.25, "w": 3, "h": 0.75},
+            {"text": "Agent: Report Synthesizer\n(Bedrock)", "x": 4, "y": 6, "w": 3, "h": 0.75},
+            {"text": "Agent: Chaos Injector\n(SSM)", "x": 4, "y": 6.75, "w": 3, "h": 0.75},
+
+            # --- Target Application Zone ---
+            {"text": "CloudFront", "x": 9, "y": 4, "w": 2, "h": 0.75},
+            {"text": "S3 Bucket\n(React Frontend)", "x": 12, "y": 4, "w": 3, "h": 0.75},
+            {"text": "API Gateway", "x": 9, "y": 5.5, "w": 2, "h": 0.75},
+            {"text": "Lambda\n(FastAPI Backend)", "x": 12, "y": 5.5, "w": 3, "h": 0.75},
+            {"text": "CloudWatch Logs", "x": 12, "y": 6.5, "w": 3, "h": 0.75},
+
+            # --- Shared Services & Arrows ---
+            {"text": "S3 Artifacts Bucket\n(Logs, Scripts, Reports)", "x": 5, "y": 8, "w": 6, "h": 0.75},
+            {"text": "3. Applies Load / Injects Fault", "x": 7.2, "y": 5.4, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
+            {"text": "4. Reads Logs", "x": 8.7, "y": 6.65, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
         ],
-        "notes": "This slide provides a simplified visual flow of the architecture, making it easy for both technical and non-technical stakeholders to understand the process from user input to final notification."
+        "notes": "This detailed diagram shows the two separate applications and how they interact. The Cortex Engine (left) is the testing tool, and the E-Commerce App (right) is the target being tested. All interactions are orchestrated and serverless."
     },
     {
         "title": "Key Advantages: The Business Impact",
@@ -228,6 +246,8 @@ def create_presentation(filename="Cortex_Performance_Engine_Stakeholder_Presenta
                 table.cell(0, c).text_frame.paragraphs[0].font.bold = True
                 table.cell(0, c).text_frame.paragraphs[0].font.size = Pt(16)
                 table.cell(0, c).text_frame.paragraphs[0].font.color.rgb = THEME_COLOR_BLUE
+                table.cell(0, c).fill.solid()
+                table.cell(0, c).fill.fore_color.rgb = RGBColor(242, 242, 242)
 
             for r, row_data in enumerate(table_data["rows"]):
                 for c, cell_text in enumerate(row_data):
@@ -236,19 +256,28 @@ def create_presentation(filename="Cortex_Performance_Engine_Stakeholder_Presenta
 
         if slide_data.get("is_diagram"):
             for element in slide_data.get("diagram_elements", []):
+                if element.get("no_box"):
+                    txBox = slide.shapes.add_textbox(Inches(element["x"]), Inches(element["y"]), Inches(element["w"]), Inches(element["h"]))
+                    p = txBox.text_frame.paragraphs[0]
+                    p.text = element["text"]
+                    p.font.size = Pt(element.get("font_size", 14))
+                    p.font.italic = True
+                    continue
+
                 x, y, w, h = (Inches(v) for v in [element["x"], element["y"], element["w"], element["h"]])
-                txBox = slide.shapes.add_textbox(x, y, w, h)
-                tf = txBox.text_frame
-                p = tf.paragraphs[0]
-                p.text = element["text"]
-                p.alignment = PP_ALIGN.CENTER
-                p.font.size = Pt(14)
+                shape = slide.shapes.add_shape(1, x, y, w, h) # 1 = rectangle
+                shape.text = element["text"]
+                shape.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+                shape.text_frame.paragraphs[0].font.size = Pt(element.get("font_size", 14))
+                
                 if element.get("is_group"):
-                    p.font.bold = True
-                    # You would typically draw a shape behind it, but text is the best we can do here.
+                    shape.text_frame.paragraphs[0].font.bold = True
+                    shape.fill.solid()
+                    shape.fill.fore_color.rgb = RGBColor(242, 242, 242)
                 else:
-                    p.font.bold = True
-                    p.font.color.rgb = THEME_COLOR_BLUE
+                    shape.text_frame.paragraphs[0].font.bold = True
+                    shape.fill.solid()
+                    shape.fill.fore_color.rgb = RGBColor(220, 230, 242) # Light blue
         
         if "notes" in slide_data:
             notes_slide = slide.notes_slide
