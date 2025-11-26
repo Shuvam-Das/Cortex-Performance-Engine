@@ -8,6 +8,13 @@ from pptx.dml.color import RGBColor
 # --- Professional Theme Colors ---
 THEME_COLOR_BLUE = RGBColor(0, 82, 165)
 THEME_COLOR_GRAY = RGBColor(128, 128, 128)
+COLOR_CORTEX_ZONE = RGBColor(220, 230, 242) # Light Blue
+COLOR_TARGET_ZONE = RGBColor(226, 240, 217) # Light Green
+COLOR_SHARED_ZONE = RGBColor(242, 242, 242) # Light Gray
+COLOR_INTERACTION = RGBColor(255, 242, 204) # Light Yellow
+COLOR_ARROW = RGBColor(191, 144, 0) # Gold
+
+
 
 # --- Presentation Content ---
 # Each dictionary in this list represents a slide.
@@ -73,42 +80,60 @@ slides_content = [
         "notes": "This slide clearly articulates the four key pillars of the solution."
     },
     {
-        "title": "Detailed Architecture: Cortex Engine & Target Application",
+        "title": "Architecture Part 1: The High-Level Flow",
         "is_diagram": True,
         "diagram_elements": [
             # --- Groups ---
-            {"text": "User & CI/CD", "x": 0.5, "y": 1.5, "w": 15, "h": 1.5, "is_group": True, "font_size": 12},
-            {"text": "Cortex Performance Engine", "x": 0.5, "y": 3.25, "w": 7, "h": 4.5, "is_group": True, "font_size": 12},
-            {"text": "Target Application: E-Commerce Web App", "x": 8.5, "y": 3.25, "w": 7, "h": 4.5, "is_group": True, "font_size": 12},
+            {"text": "Cortex Performance Engine", "x": 0.5, "y": 1.5, "w": 7.5, "h": 6.5, "is_group": True, "font_size": 14, "color": COLOR_CORTEX_ZONE},
+            {"text": "Target E-Commerce Application", "x": 8.25, "y": 1.5, "w": 7.25, "h": 6.5, "is_group": True, "font_size": 14, "color": COLOR_TARGET_ZONE},
+            {"text": "Shared Services", "x": 0.5, "y": 8.25, "w": 15, "h": 0.5, "is_group": True, "font_size": 14, "color": COLOR_SHARED_ZONE},
             
-            # --- User & CI/CD Zone ---
-            {"text": "User", "x": 1, "y": 2, "w": 1, "h": 0.75},
-            {"text": "GitHub Actions\n(CI/CD Pipeline)", "x": 13, "y": 2, "w": 2, "h": 0.75},
-            {"text": "1. User initiates test", "x": 2.2, "y": 2.15, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
-
             # --- Cortex Performance Engine Zone ---
-            {"text": "AWS Lex\n(Chatbot)", "x": 4, "y": 2, "w": 1.5, "h": 0.75},
-            {"text": "AWS Step Functions\n(Orchestrator)", "x": 1, "y": 4, "w": 2.5, "h": 1},
-            {"text": "2. Orchestrates Agents", "x": 2, "y": 5.25, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
-            {"text": "Agent: Log Analyzer\n(Lambda)", "x": 4, "y": 3.75, "w": 3, "h": 0.75},
-            {"text": "Agent: Script Generator\n(Bedrock)", "x": 4, "y": 4.5, "w": 3, "h": 0.75},
-            {"text": "Agent: Test Executor\n(Fargate Spot + JMeter)", "x": 4, "y": 5.25, "w": 3, "h": 0.75},
-            {"text": "Agent: Report Synthesizer\n(Bedrock)", "x": 4, "y": 6, "w": 3, "h": 0.75},
-            {"text": "Agent: Chaos Injector\n(SSM)", "x": 4, "y": 6.75, "w": 3, "h": 0.75},
+            {"text": "User", "x": 1, "y": 2, "w": 1.5, "h": 0.75, "color": COLOR_INTERACTION},
+            {"text": "AWS Lex\n(Chatbot)", "x": 3, "y": 2, "w": 2, "h": 0.75, "color": COLOR_INTERACTION},
+            {"text": "AWS Step Functions\n(Orchestrator)", "x": 1, "y": 4.5, "w": 3, "h": 1.5},
+            {"text": "Agent: Log Analyzer", "x": 4.5, "y": 3.5, "w": 3, "h": 0.75},
+            {"text": "Agent: Script Generator", "x": 4.5, "y": 4.5, "w": 3, "h": 0.75},
+            {"text": "Agent: Test Executor", "x": 4.5, "y": 5.5, "w": 3, "h": 0.75},
+            {"text": "Agent: Report Synthesizer", "x": 4.5, "y": 6.5, "w": 3, "h": 0.75},
 
             # --- Target Application Zone ---
-            {"text": "CloudFront", "x": 9, "y": 4, "w": 2, "h": 0.75},
-            {"text": "S3 Bucket\n(React Frontend)", "x": 12, "y": 4, "w": 3, "h": 0.75},
-            {"text": "API Gateway", "x": 9, "y": 5.5, "w": 2, "h": 0.75},
-            {"text": "Lambda\n(FastAPI Backend)", "x": 12, "y": 5.5, "w": 3, "h": 0.75},
-            {"text": "CloudWatch Logs", "x": 12, "y": 6.5, "w": 3, "h": 0.75},
+            {"text": "CloudFront", "x": 8.75, "y": 3.5, "w": 2.5, "h": 0.75},
+            {"text": "S3 Bucket\n(React Frontend)", "x": 12.25, "y": 3.5, "w": 2.75, "h": 0.75},
+            {"text": "API Gateway", "x": 8.75, "y": 5.5, "w": 2.5, "h": 0.75},
+            {"text": "Lambda\n(FastAPI Backend)", "x": 12.25, "y": 5.5, "w": 2.75, "h": 0.75},
 
-            # --- Shared Services & Arrows ---
-            {"text": "S3 Artifacts Bucket\n(Logs, Scripts, Reports)", "x": 5, "y": 8, "w": 6, "h": 0.75},
-            {"text": "3. Applies Load / Injects Fault", "x": 7.2, "y": 5.4, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
-            {"text": "4. Reads Logs", "x": 8.7, "y": 6.65, "w": 2, "h": 0.5, "font_size": 11, "no_box": True},
+            # --- Shared Services Zone ---
+            {"text": "S3 Artifacts Bucket", "x": 1, "y": 8.25, "w": 6.5, "h": 0.5},
+            {"text": "CloudWatch Logs", "x": 8.5, "y": 8.25, "w": 6.5, "h": 0.5},
+
+            # --- Arrows and Labels ---
+            {"text": "1. 'Run a test...'", "x": 1.75, "y": 2.9, "w": 2, "h": 0.5, "font_size": 11, "no_box": True, "color": COLOR_ARROW},
+            {"text": "2. Starts Pipeline", "x": 2.5, "y": 3.5, "w": 2, "h": 0.5, "font_size": 11, "no_box": True, "color": COLOR_ARROW},
+            {"text": "3. Orchestrates Agents", "x": 3.25, "y": 5.25, "w": 2, "h": 0.5, "font_size": 11, "no_box": True, "color": COLOR_ARROW},
+            {"text": "4. Reads Logs", "x": 7.5, "y": 7.25, "w": 2, "h": 0.5, "font_size": 11, "no_box": True, "color": COLOR_ARROW},
+            {"text": "5. Applies Load", "x": 7.5, "y": 4.5, "w": 2, "h": 0.5, "font_size": 11, "no_box": True, "color": COLOR_ARROW},
+            {"text": "6. Writes/Reads Artifacts", "x": 1, "y": 7.25, "w": 3, "h": 0.5, "font_size": 11, "no_box": True, "color": COLOR_ARROW},
         ],
-        "notes": "This detailed diagram shows the two separate applications and how they interact. The Cortex Engine (left) is the testing tool, and the E-Commerce App (right) is the target being tested. All interactions are orchestrated and serverless."
+        "notes": "This diagram shows the high-level flow. The Cortex Engine is a separate, independent system that observes and tests the target application without being part of it, which is a key architectural principle."
+    },
+    {
+        "title": "Architecture Part 2: Rationale & Communication",
+        "subtitle": "Explaining the 'Why' behind our service choices and the 'How' of data flow.",
+        "table": {
+            "headers": ["Service", "Why We Chose It (The Rationale)"],
+            "rows": [
+                ["AWS Step Functions", "Provides visual workflows, error handling, and retries out-of-the-box. Perfect for sequencing agentic tasks. It's the serverless 'brain' of the operation."],
+                ["AWS Lambda", "Ideal for short-lived, event-driven tasks like our agents. We only pay for compute time used, ensuring maximum cost-efficiency. Zero server management."],
+                ["AWS Fargate (Spot)", "Combines serverless benefits (no EC2 management) with massive cost savings (up to 90% for Spot). Perfect for the containerized JMeter test executor."],
+                ["Amazon Bedrock", "Gives us easy, secure access to powerful foundation models without managing ML infrastructure. This is the core of our AI-driven analysis and generation capabilities."],
+                ["S3 Artifacts Bucket", "Acts as the central, decoupled data bus. Agents communicate indirectly by passing data (logs, scripts, reports) through S3, making the system robust and scalable."]
+            ]
+        },
+        "points": [
+            {"text": "How Real-Time Communication Works:", "bold": True, "level": 0},
+            {"text": "The entire process is asynchronous. Step Functions passes a JSON state object between each agent, containing a unique `runId` and pointers to artifacts in the S3 bucket.", "level": 1}
+        ]
     },
     {
         "title": "Key Advantages: The Business Impact",
@@ -261,23 +286,29 @@ def create_presentation(filename="Cortex_Performance_Engine_Stakeholder_Presenta
                     p = txBox.text_frame.paragraphs[0]
                     p.text = element["text"]
                     p.font.size = Pt(element.get("font_size", 14))
+                    p.font.color.rgb = element.get("color", RGBColor(0,0,0))
                     p.font.italic = True
                     continue
 
                 x, y, w, h = (Inches(v) for v in [element["x"], element["y"], element["w"], element["h"]])
                 shape = slide.shapes.add_shape(1, x, y, w, h) # 1 = rectangle
                 shape.text = element["text"]
-                shape.text_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
-                shape.text_frame.paragraphs[0].font.size = Pt(element.get("font_size", 14))
+                tf = shape.text_frame
+                tf.margin_bottom = Inches(0.05)
+                tf.margin_top = Inches(0.05)
+                tf.vertical_anchor = 1 # MSO_ANCHOR.MIDDLE
+                p = tf.paragraphs[0]
+                p.alignment = PP_ALIGN.CENTER
+                p.font.size = Pt(element.get("font_size", 12))
                 
                 if element.get("is_group"):
-                    shape.text_frame.paragraphs[0].font.bold = True
+                    p.font.bold = True
                     shape.fill.solid()
-                    shape.fill.fore_color.rgb = RGBColor(242, 242, 242)
+                    shape.fill.fore_color.rgb = element.get("color", RGBColor(242, 242, 242))
                 else:
-                    shape.text_frame.paragraphs[0].font.bold = True
+                    p.font.bold = True
                     shape.fill.solid()
-                    shape.fill.fore_color.rgb = RGBColor(220, 230, 242) # Light blue
+                    shape.fill.fore_color.rgb = element.get("color", RGBColor(220, 230, 242))
         
         if "notes" in slide_data:
             notes_slide = slide.notes_slide
