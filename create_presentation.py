@@ -272,7 +272,7 @@ def create_presentation(filename="Cortex_Performance_Engine_Stakeholder_Presenta
                 table.cell(0, c).text_frame.paragraphs[0].font.size = Pt(16)
                 table.cell(0, c).text_frame.paragraphs[0].font.color.rgb = THEME_COLOR_BLUE
                 table.cell(0, c).fill.solid()
-                table.cell(0, c).fill.fore_color.rgb = RGBColor(242, 242, 242)
+                table.cell(0, c).fill.fore_color.rgb = COLOR_SHARED_ZONE
 
             for r, row_data in enumerate(table_data["rows"]):
                 for c, cell_text in enumerate(row_data):
@@ -286,25 +286,28 @@ def create_presentation(filename="Cortex_Performance_Engine_Stakeholder_Presenta
                     p = txBox.text_frame.paragraphs[0]
                     p.text = element["text"]
                     p.font.size = Pt(element.get("font_size", 14))
-                    p.font.color.rgb = element.get("color", RGBColor(0,0,0))
+                    p.font.color.rgb = element.get("color", RGBColor(0, 0, 0))
                     p.font.italic = True
+                    p.font.bold = element.get("bold", False)
                     continue
 
                 x, y, w, h = (Inches(v) for v in [element["x"], element["y"], element["w"], element["h"]])
                 shape = slide.shapes.add_shape(1, x, y, w, h) # 1 = rectangle
                 shape.text = element["text"]
                 tf = shape.text_frame
-                tf.margin_bottom = Inches(0.05)
-                tf.margin_top = Inches(0.05)
-                tf.vertical_anchor = 1 # MSO_ANCHOR.MIDDLE
+                tf.margin_bottom = Inches(0.08)
+                tf.margin_top = Inches(0.08)
+                from pptx.enum.text import MSO_ANCHOR
+                tf.vertical_anchor = MSO_ANCHOR.MIDDLE
                 p = tf.paragraphs[0]
                 p.alignment = PP_ALIGN.CENTER
                 p.font.size = Pt(element.get("font_size", 12))
                 
                 if element.get("is_group"):
                     p.font.bold = True
+                    shape.line.color.rgb = RGBColor(255, 255, 255)
                     shape.fill.solid()
-                    shape.fill.fore_color.rgb = element.get("color", RGBColor(242, 242, 242))
+                    shape.fill.fore_color.rgb = element.get("color", COLOR_SHARED_ZONE)
                 else:
                     p.font.bold = True
                     shape.fill.solid()
