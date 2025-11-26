@@ -5,13 +5,12 @@ on:
     branches:
       - main
 
-env:
-  AWS_REGION: us-east-1 # Or your preferred region
-
 jobs:
   build-and-deploy:
     name: Build and Deploy to AWS
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1 # Or your preferred region
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -47,18 +46,28 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./ecommerce-webapp/backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
+      - name: Build, tag, and push E-commerce Frontend image to ECR
+        id: build-frontend-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ecommerce-frontend
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./ecommerce-webapp/frontend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Deploy E-Commerce CDK Stack
+      - name: Deploy E-Commerce App CDK Stack
         working-directory: ./ecommerce-webapp/iac
         run: |
           npm install
           npm run cdk deploy -- --all --require-approval never
 
-      - name: Deploy Cortex Engine CDK Stack
+      - name: Deploy Cortex Performance Engine CDK Stack
         working-directory: ./performance-platform/iac
         run: |
           npm install
