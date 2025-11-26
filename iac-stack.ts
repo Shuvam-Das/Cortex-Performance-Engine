@@ -28,6 +28,7 @@ export class PerformancePlatformStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMFullAccess'), // For Chaos Agent
         iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonBedrockFullAccess'), // For AI Agents
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonCodeGuruProfilerFullAccess'), // For Live Profiling Agent
       ],
     });
     artifactsBucket.grantReadWrite(lambdaAgentRole);
@@ -91,10 +92,19 @@ export class PerformancePlatformStack extends cdk.Stack {
       });
     };
 
+    // --- Standard Agents ---
     const logAnalyzer = createLambdaAgent('LogAnalyzerAgent', 'log-analyzer');
     const scriptGenerator = createLambdaAgent('ScriptGeneratorAgent', 'script-generator');
     const reportSynthesizer = createLambdaAgent('ReportSynthesizerAgent', 'report-synthesizer');
     const chaosAgent = createLambdaAgent('ChaosAgent', 'chaos-agent');
+
+    // --- Advanced Feature Agents ---
+    const dataGeneratorAgent = createLambdaAgent('DataGeneratorAgent', 'data-generator');
+    const costAdvisorAgent = createLambdaAgent('CostAdvisorAgent', 'cost-advisor');
+    const resilienceAdvisorAgent = createLambdaAgent('ResilienceAdvisorAgent', 'resilience-advisor');
+    // This agent is designed to be triggered by SNS/EventBridge from a CloudWatch Alarm on the target app
+    const profilingAgent = createLambdaAgent('ProfilingAgent', 'profiling-agent');
+
 
     // --- Fargate Task for JMeter Test Executor ---
     const testExecutorRepo = ecr.Repository.fromRepositoryName(this, 'TestExecutorRepo', 'test-executor');
@@ -114,7 +124,8 @@ export class PerformancePlatformStack extends cdk.Stack {
     });
 
     // --- Step Function State Machine Definition ---
-    const startTest = new tasks.LambdaInvoke(this, 'RunLogAnalyzer', { lambdaFunction: logAnalyzer })
+    const startTest = new tasks.LambdaInvoke(this, 'RunDataGenerator', { lambdaFunction: dataGeneratorAgent })
+      .next(new tasks.LambdaInvoke(this, 'RunLogAnalyzer', { lambdaFunction: logAnalyzer }))
       .next(new tasks.LambdaInvoke(this, 'RunScriptGenerator', { lambdaFunction: scriptGenerator }))
       .next(testExecutorTask)
       .next(new tasks.LambdaInvoke(this, 'RunReportSynthesizer', { lambdaFunction: reportSynthesizer }));
