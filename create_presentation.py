@@ -352,6 +352,78 @@ def create_presentation(filename="Cortex_Performance_Engine_Stakeholder_Presenta
     print(f"Presentation '{filename}' created successfully.")
     prs.save(filename)
 
-if __name__ == '__main__':
+def generate_animated_diagram(filename, elements, animation_flow):
+    """
+    Generates an animated GIF of an architecture diagram.
+    """
+    width, height = 1600, 900
+    dpi = 100
+    frames = []
 
-    create_presentation()
+    # Load a font
+    try:
+        font = ImageFont.truetype("arial.ttf", 18)
+        font_bold = ImageFont.truetype("arialbd.ttf", 20)
+    except IOError:
+        font = ImageFont.load_default()
+        font_bold = ImageFont.load_default()
+
+    # Create base image
+    base_img = Image.new('RGB', (width, height), 'white')
+    draw = ImageDraw.Draw(base_img)
+
+    # Draw static elements
+    for el in elements:
+        x, y, w, h = [int(v * dpi) for v in [el["x"], el["y"], el["w"], el["h"]]]
+        
+        if el.get("no_box"):
+            p_font = font_bold if el.get("bold") else font
+            draw.text((x, y), el["text"], font=p_font, fill=el.get("color", (0,0,0)))
+        elif el.get("is_group"):
+            draw.rectangle([x, y, x + w, y + h], fill=el.get("color", COLOR_SHARED_ZONE))
+            draw.text((x + 10, y + 5), el["text"], font=font_bold, fill=(0,0,0))
+        else:
+            draw.rectangle([x, y, x + w, y + h], fill=el.get("color", COLOR_CORTEX_ZONE), outline="black")
+            draw.text((x + w/2, y + h/2), el["text"], font=font_bold, fill=(0,0,0), anchor="mm", align="center")
+
+    # Create frames for animation
+    element_map = {el["id"]: el for el in elements if "id" in el}
+
+    for i in range(len(animation_flow)):
+        frame_img = base_img.copy()
+        frame_draw = ImageDraw.Draw(frame_img)
+        
+        # Highlight current and previous elements
+        for j, flow_id in enumerate(animation_flow):
+            if j > i:
+                break
+            
+            el = element_map.get(flow_id)
+            if not el or el.get("no_box") or el.get("is_group"):
+                continue
+
+            x, y, w, h = [int(v * dpi) for v in [el["x"], el["y"], el["w"], el["h"]]]
+            
+            # Highlight the current step
+            if j == i:
+                frame_draw.rectangle([x-5, y-5, x + w+5, y + h+5], outline=COLOR_HIGHLIGHT, width=5)
+
+        frames.append(frame_img)
+
+    # Add a final frame with a longer pause
+    frames.append(frames[-1])
+    frames.append(frames[-1])
+
+    # Save as GIF
+    imageio.mimsave(filename, frames, duration=0.8)
+    print(f"Generated animated diagram: {filename}")
+
+
+if __name__ == '__main__':
+    try:
+        create_presentation()
+    finally:
+        # Clean up generated GIF files
+        for slide in slides_content:
+            if slide.get("gif_filename") and os.path.exists(slide.get("gif_filename")):
+                os.remove(slide.get("gif_filename"))
