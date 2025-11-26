@@ -5,9 +5,12 @@ on:
     branches:
       - main
 
+env:
+  AWS_REGION: us-east-1 # Or your preferred region
+
 jobs:
-  deploy-ecommerce-app:
-    name: Deploy E-Commerce Web App
+  build-and-deploy:
+    name: Build and Deploy to AWS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,40 +21,44 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Or your preferred region
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push JMeter image to ECR
+        id: build-jmeter-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: test-executor
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./performance-platform/test-executor
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build, tag, and push E-commerce Backend image to ECR
+        id: build-backend-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ecommerce-backend
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./ecommerce-webapp/backend
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Deploy CDK Stack
+      - name: Deploy E-Commerce CDK Stack
         working-directory: ./ecommerce-webapp/iac
         run: |
           npm install
           npm run cdk deploy -- --all --require-approval never
 
-  deploy-cortex-engine:
-    name: Deploy Cortex Performance Engine
-    runs-on: ubuntu-latest
-    needs: deploy-ecommerce-app # Optional: deploy this after the webapp
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Or your preferred region
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Deploy CDK Stack
+      - name: Deploy Cortex Engine CDK Stack
         working-directory: ./performance-platform/iac
         run: |
           npm install
