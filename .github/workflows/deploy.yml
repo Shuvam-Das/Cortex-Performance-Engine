@@ -23,6 +23,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Bootstrap CDK
+        run: |
+          npm install -g aws-cdk
+          cdk bootstrap aws://399668701064/us-east-1 || echo "Already bootstrapped"
+
       - name: Install dependencies
         run: npm install
 

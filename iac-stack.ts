@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
@@ -9,6 +8,7 @@ import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as logs from 'aws-cdk-lib/aws-logs';
 
 export class PerformancePlatformStack extends cdk.Stack {
@@ -139,4 +139,3 @@ export class PerformancePlatformStack extends cdk.Stack {
 
 
 
-This new structure provides a complete, professional, and highly advanced solution that meets all of your requirements for a modern, resilient, and observable e - commerce ecosystem.
