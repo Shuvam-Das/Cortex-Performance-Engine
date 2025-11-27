@@ -1,33 +1,51 @@
-const { SSMClient, sendCommand } = require("@aws-sdk/client-ssm");
-const { createLogger } = require('../common/logger');
+const { SFNClient, StartExecutionCommand } = require("@aws-sdk/client-sfn");
 
-const ssm = new SSMClient({});
+const sfnClient = new SFNClient({ region: process.env.AWS_REGION });
+const STATE_MACHINE_ARN = process.env.STATE_MACHINE_ARN;
 
 exports.handler = async (event) => {
-    const { correlationId, chaosType, target, duration } = event;
-    const logger = createLogger('chaos-agent', correlationId);
+    console.log("Lex event received:", JSON.stringify(event, null, 2));
 
-    logger.info({ chaosType, target, duration }, 'Chaos Agent starting.');
-
-    let documentName;
-    switch (chaosType) {
-        case 'CPU_STRESS':
-            documentName = 'AWS-RunShellScript';
-            // This is a simplified example. In a real scenario, you'd use more robust chaos tools.
-            parameters = { commands: [`stress --cpu 1 --timeout ${duration}`] };
-            break;
-        // Add cases for LATENCY, ERROR_INJECTION, etc.
-        default:
-            logger.warn({ chaosType }, 'Unsupported chaos type requested.');
-            return { status: 'SKIPPED', reason: 'Unsupported chaos type' };
+    const intentName = event.sessionState.intent.name;
+    const slots = event.sessionState.intent.slots;
+    
+    // Default to a 'PERFORMANCE' test type if not specified
+    let testType = "PERFORMANCE"; 
+    if (intentName === 'RunChaosTest') {
+        testType = "CHAOS";
     }
 
-    await ssm.send(new sendCommand({
-        DocumentName: documentName,
-        InstanceIds: [target], // The EC2 instance ID of the web app
-        Parameters: parameters,
-    }));
+    const sfnInput = {
+        testType: testType,
+        // Future enhancement: Pass parameters from Lex slots
+        // e.g., users: slots.userCount?.value?.interpretedValue || '100'
+    };
 
-    logger.info(`Successfully initiated ${chaosType} chaos experiment.`);
-    return { status: 'SUCCESS' };
+    const command = new StartExecutionCommand({
+        stateMachineArn: STATE_MACHINE_ARN,
+        input: JSON.stringify(sfnInput),
+    });
+
+    try {
+        await sfnClient.send(command);
+        console.log("State machine execution started successfully.");
+        
+        // Respond to Lex that the request was successful
+        return {
+            sessionState: {
+                dialogAction: { type: 'Close' },
+                intent: { name: intentName, state: 'Fulfilled' }
+            },
+            messages: [{ contentType: 'PlainText', content: `OK, I've started the ${testType.toLowerCase()} test for you.` }]
+        };
+    } catch (error) {
+        console.error("Error starting state machine:", error);
+        return {
+            sessionState: {
+                dialogAction: { type: 'Close' },
+                intent: { name: intentName, state: 'Failed' }
+            },
+            messages: [{ contentType: 'PlainText', content: "Sorry, I couldn't start the test. Please check the system logs." }]
+        };
+    }
 };

@@ -157,6 +157,19 @@ export class PerformancePlatformStack extends cdk.Stack {
       stateMachineName: 'CortexPerformanceEngineMachine',
     });
 
+    // --- Lambda function to connect Lex to the State Machine ---
+    const lexTriggerLambda = new lambda.Function(this, 'LexTriggerLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset('./agents/lex-trigger'), // Path relative to iac directory
+      environment: {
+        STATE_MACHINE_ARN: stateMachine.stateMachineArn,
+      },
+    });
+
+    // Grant the new Lambda permission to start the state machine
+    stateMachine.grantStartExecution(lexTriggerLambda);
+
     // --- AWS Lex Bot to trigger the State Machine ---
     const botRole = new iam.Role(this, 'CortexLexBotRole', { assumedBy: new iam.ServicePrincipal('lexv2.amazonaws.com') });
     stateMachine.grantStartExecution(botRole);
@@ -170,13 +183,29 @@ export class PerformancePlatformStack extends cdk.Stack {
         localeId: 'en_US',
         nluConfidenceThreshold: 0.40,
         intents: [
-          // In the AWS Lex Console, you will configure intents (e.g., 'RunLoadTest')
-          // to trigger a Lambda function, which in turn starts the 
-          // 'CortexPerformanceEngineMachine' Step Function with the appropriate input.
+          sampleUtterances: [
+            { utterance: 'run a performance test' },
+            { utterance: 'start a load test' },
+          ],
+          fulfillmentCodeHook: { enabled: true }, // Use our Lambda to fulfill the intent
+          },
+      {
+        name: 'RunChaosTest',
+        description: 'Triggers a chaos engineering experiment.',
+        sampleUtterances: [
+          { utterance: 'run a chaos test' },
+          { utterance: 'start a chaos experiment' },
         ],
-      }],
+        fulfillmentCodeHook: { enabled: true }, // Use our Lambda to fulfill the intent
+      }
+      ],
+      // Connect the Lex bot to our trigger Lambda
+      fulfillment: {
+        codeHook: { lambdaCodeHook: { codeHookInterfaceVersion: '1.0', lambdaArn: lexTriggerLambda.functionArn } }
+      }
+    }],
     });
-  }
+}
 }
 
 ```
