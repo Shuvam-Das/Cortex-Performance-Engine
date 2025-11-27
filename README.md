@@ -47,14 +47,23 @@ This repository is configured for continuous deployment using the `deploy.yml` G
 
 ### Prerequisites
 
-1.  **AWS Account**: An active AWS account.
-2.  **GitHub Secrets**: You must configure the following secrets in your GitHub repository settings (`Settings > Secrets and variables > Actions`):
-    -   `AWS_ACCESS_KEY_ID`: Your AWS IAM user access key.
-    -   `AWS_SECRET_ACCESS_KEY`: Your AWS IAM user secret key.
+1.  **AWS Account & IAM User**: You need an active AWS account and an IAM user with programmatic access and `AdministratorAccess` permissions for the initial deployment.
+
+2.  **One-Time CDK Bootstrap**: Before the first deployment, you must prepare your AWS account for the CDK by running the bootstrap command. **This only needs to be done once per account/region.**
+    ```bash
+    # Replace ACCOUNT-ID and REGION with your specific AWS details
+    # Example: cdk bootstrap aws://123456789012/us-east-1
+    cdk bootstrap aws://ACCOUNT-ID/REGION
+    ```
+    *Note: You must have Node.js and the AWS CDK installed locally to run this command (`npm install -g aws-cdk`).*
+
+3.  **GitHub Secrets**: You must configure the following secrets in your GitHub repository settings (`Settings > Secrets and variables > Actions`):
+    -   `AWS_ACCESS_KEY_ID`: Your IAM user's access key.
+    -   `AWS_SECRET_ACCESS_KEY`: Your IAM user's secret key.
 
 ### How it Works
 
-On any push to the `main` branch, the `deploy.yml` pipeline will automatically:
+On any push to the `main` branch, the `deploy.yml` GitHub Actions workflow will automatically:
 
 1.  **Log in to AWS** and the Amazon Elastic Container Registry (ECR).
 2.  **Build Docker Images** for the JMeter test executor and the e-commerce backend.
