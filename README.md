@@ -1,64 +1,70 @@
-# Cortex Performance Engine
+# E-Commerce Suite: Web App & Performance Platform
 
-This repository contains a complete, production-ready cloud ecosystem, designed for cost-optimized and automated deployment on AWS. It consists of two main, independent projects:
+This repository contains a complete, production-ready e-commerce ecosystem, designed for cost-optimized and automated deployment on AWS. It consists of two main projects:
 
-1.  **`ecommerce-webapp/`**: A modern, serverless e-commerce application built with React and Python (FastAPI). This application serves as the target for our testing platform.
-2.  **`performance-platform/`**: The **Cortex Performance Engine** itself. A sophisticated, AI-driven testing platform that uses a chatbot interface (**AWS Lex**), generative AI (**Amazon Bedrock**), and a self-hosted workflow engine (**n8n on AWS Fargate**) to run performance and chaos engineering tests.
+1.  **`ecommerce-webapp/`**: A modern, serverless e-commerce application built with React and Python (FastAPI).
+2.  **`performance-platform/`**: A sophisticated, AI-driven testing platform that uses a chatbot interface to run performance tests and chaos engineering experiments against the web app.
 
-This architecture ensures a clean separation of concerns between the application being tested and the intelligent tool that tests it.
+## High-Level Architecture
+
+The **Cortex Performance Platform** is an independent system that intelligently tests the **E-Commerce Web Application**. It reads the application's logs to learn its behavior, generates test scripts, applies load to its public endpoints, and produces an analysis report.
 
 ---
 
 ## 1. E-Commerce Web Application (`ecommerce-webapp/`)
 
-A fully functional online store designed for cloud-native deployment. It is built to generate realistic production logs that the performance platform can analyze.
+A fully functional online store.
 
--   **Frontend**: A responsive user interface built with **React**.
--   **Backend**: A scalable API built with **Python (FastAPI)**.
--   **Deployment**: Fully automated via the AWS CDK, deploying to a serverless stack (API Gateway, Lambda, S3, CloudFront) with production-ready caching and security policies.
--   **Static Endpoint**: The application is accessed via a permanent, static domain name provided by **Amazon CloudFront**.
+-   **Backend**: A scalable API built with **Python (FastAPI)**, deployed as a container on AWS.
+-   **Deployment**: The entire application is defined as Infrastructure as Code in the `ecommerce-webapp/iac` directory using the **AWS CDK**.
+
+### Key Features
+-   Structured JSON logging for easy analysis by the performance platform.
+-   Containerized backend for consistent deployments.
 
 ---
 
 ## 2. Cortex Performance Engine (`performance-platform/`)
 
-An intelligent, agentic system for ensuring the resilience and performance of any target application.
+An intelligent, agentic system for ensuring the resilience and performance of the e-commerce application.
 
 ### Key Features
 
 -   **Chatbot Interface (AWS Lex)**: Users interact with a chatbot to define and launch tests. No complex dashboards needed.
     -   **Example Interaction**: *"Run a stress test with 500 users for 10 minutes."* or *"Inject 200ms of latency into the database for 5 minutes."*
--   **Generative AI Scripting (Amazon Bedrock)**: The `ScriptGenerator` agent uses a Bedrock model to generate complete, complex JMeter JMX files from natural language and real log data.
--   **AI-Powered Reporting (Amazon Bedrock)**: The `ReportSynthesizer` agent uses Bedrock to analyze test results and server-side metrics, acting as an expert performance engineer to write reports with root cause analysis and actionable recommendations.
--   **Chaos Engineering**: Injects failures (e.g., CPU stress, latency, errors) into the live AWS environment to test system resilience, orchestrated via **AWS Systems Manager**.
--   **Secure, Extensible Notifications (n8n on Fargate)**: A final workflow step calls a webhook on your **private, self-hosted n8n instance** to create Jira tickets, send rich Slack messages, or log results to external systems.
--   **Static Endpoint**: The platform is triggered via a permanent, static endpoint provided by an **Application Load Balancer** fronting the n8n service.
--   **Serverless Container Orchestration (AWS Fargate)**: All containerized components (n8n, JMeter) run on AWS Fargate, eliminating the need to manage servers, clusters, or nodes. This is a deliberate choice over Kubernetes to reduce operational overhead and cost.
--   **Serverless & Cost-Optimized**: The entire platform runs on **AWS Step Functions**, **Lambda**, and **Fargate Spot**, ensuring minimal cost.
+-   **AI-Powered Automation (Amazon Bedrock)**:
+    -   **Log Analysis**: Learns user behavior from application logs.
+    -   **Script Generation**: Automatically creates complex JMeter test scripts.
+    -   **Intelligent Reporting**: Correlates test results with server metrics to produce a report with actionable observations and recommendations.
+-   **Chaos Engineering**: Injects failures (e.g., CPU stress, latency) into the live AWS environment to test system resilience, orchestrated via **AWS Systems Manager**.
+-   **Serverless & Cost-Optimized**: The entire platform runs on **AWS Step Functions**, **Lambda**, and **Fargate Spot**, ensuring minimal cost and zero server management.
 
 ---
 
-## 🚀 Automated AWS Deployment (CI/CD)
+## 🚀 Automated AWS Deployment
 
-This project is designed to be deployed on a strict budget (under $100 for the prototype phase) without sacrificing features. This is achieved by:
--   Using **serverless services** (Lambda, S3, Step Functions) which only incur costs on-demand.
--   Leveraging **AWS Fargate Spot** for JMeter tasks, saving up to 90% on compute costs.
--   Configuring the **n8n Fargate service** with minimal resources and placing it in a public subnet to avoid the high cost of a NAT Gateway.
+This repository is configured for continuous deployment using the `deploy.yml` GitHub Actions workflow.
 
----
+### Prerequisites
 
-Both applications are designed to be deployed automatically via a CI/CD pipeline (e.g., GitHub Actions) using the **AWS CDK** stacks located in their respective `iac/` directories.
+1.  **AWS Account**: An active AWS account.
+2.  **GitHub Secrets**: You must configure the following secrets in your GitHub repository settings (`Settings > Secrets and variables > Actions`):
+    -   `AWS_ACCESS_KEY_ID`: Your AWS IAM user access key.
+    -   `AWS_SECRET_ACCESS_KEY`: Your AWS IAM user secret key.
 
-### Deployment Steps (High-Level)
+### How it Works
 
-1.  **Configure AWS Credentials** for your CI/CD environment.
-2.  **Bootstrap AWS CDK** in your target AWS account and region.
-3.  **Push to the `main` branch**: A CI/CD pipeline should be configured to automatically:
-    -   Build the Dockerfiles (`test-executor`, `ecommerce-webapp/frontend`, `ecommerce-webapp/backend`) and push the images to **Amazon ECR**.
-    -   Deploy the `ecommerce-webapp` stack.
-    -   Deploy the `performance-platform` stack.
+On any push to the `main` branch, the `deploy.yml` pipeline will automatically:
+
+1.  **Log in to AWS** and the Amazon Elastic Container Registry (ECR).
+2.  **Build Docker Images** for the JMeter test executor and the e-commerce backend.
+3.  **Push Images** to their respective ECR repositories.
+4.  **Deploy Stacks via AWS CDK**:
+    -   Install Node.js dependencies for each `iac` directory.
+    -   Run `cdk deploy` to create or update all the AWS resources for both the e-commerce app and the performance platform.
 
 ## 🤖 Monitoring
 
- - **Live Status**: The **AWS Step Functions** console provides a real-time, visual graph of the testing pipeline's execution.
- - **Live Logs**: All logs from all agents are streamed to **Amazon CloudWatch** for live monitoring and can be queried using CloudWatch Logs Insights.
+ - **Live Status**: The **AWS Step Functions** console provides a real-time visual graph of the testing pipeline's execution.
+ - **Live Logs**: All logs (from both the web app and the testing agents) are streamed to **Amazon CloudWatch** for live monitoring and querying with Logs Insights.
+ - **Integration Endpoint**: After deployment, the public URL for the `n8n` service will be available in the CloudFormation outputs of the `PerformancePlatformStack`.
