@@ -7,6 +7,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as sns from 'aws-cdk-lib/aws-sns';
 import * as lex from 'aws-cdk-lib/aws-lex';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
@@ -17,6 +18,13 @@ export class PerformancePlatformStack extends cdk.Stack {
 
     // S3 Bucket for artifacts and logs
     const artifactsBucket = new s3.Bucket(this, 'ArtifactsBucket');
+
+    // SNS Topic for notifications - A "good to have" feature for decoupling.
+    const notificationsTopic = new sns.Topic(this, 'CortexNotificationsTopic');
+    new cdk.CfnOutput(this, 'NotificationsTopicArn', {
+      value: notificationsTopic.topicArn,
+      description: 'The ARN of the SNS topic to subscribe to for test completion notifications.'
+    });
 
     // A single VPC for all our services to communicate securely
     const vpc = new ec2.Vpc(this, 'CortexVpc', { maxAzs: 2 });
@@ -32,6 +40,7 @@ export class PerformancePlatformStack extends cdk.Stack {
       ],
     });
     artifactsBucket.grantReadWrite(lambdaAgentRole);
+    notificationsTopic.grantPublish(lambdaAgentRole); // Allow agents to publish to the topic
 
     // A single ECS Cluster for all containerized services (n8n and JMeter)
     const ecsCluster = new ecs.Cluster(this, 'CortexCluster', { vpc });
@@ -86,8 +95,8 @@ export class PerformancePlatformStack extends cdk.Stack {
         role: lambdaAgentRole,
         environment: {
           S3_BUCKET: artifactsBucket.bucketName,
-          N8N_WEBHOOK_URL: `http://${n8nUrl}/webhook/your-webhook-path` // Update with your actual n8n webhook path
-        },
+          NOTIFICATIONS_TOPIC_ARN: notificationsTopic.topicArn
+        }, // No more manual webhook URLs!
         timeout: cdk.Duration.minutes(2),
       });
     };
@@ -123,12 +132,19 @@ export class PerformancePlatformStack extends cdk.Stack {
       capacityProviderStrategies: [{ capacityProvider: 'FARGATE_SPOT', weight: 1 }],
     });
 
+    // Final step: Publish a success message to the SNS topic.
+    const publishNotification = new tasks.SnsPublish(this, 'PublishCompletionNotification', {
+      topic: notificationsTopic,
+      message: sfn.TaskInput.fromJsonPathAt('$.Payload'), // Pass the output from the ReportSynthesizer
+    });
+
     // --- Step Function State Machine Definition ---
     const startTest = new tasks.LambdaInvoke(this, 'RunDataGenerator', { lambdaFunction: dataGeneratorAgent })
       .next(new tasks.LambdaInvoke(this, 'RunLogAnalyzer', { lambdaFunction: logAnalyzer }))
       .next(new tasks.LambdaInvoke(this, 'RunScriptGenerator', { lambdaFunction: scriptGenerator }))
       .next(testExecutorTask)
-      .next(new tasks.LambdaInvoke(this, 'RunReportSynthesizer', { lambdaFunction: reportSynthesizer }));
+      .next(new tasks.LambdaInvoke(this, 'RunReportSynthesizer', { lambdaFunction: reportSynthesizer }))
+      .next(publishNotification); // Add the notification step to the end of the pipeline.
 
     const startChaos = new tasks.LambdaInvoke(this, 'RunChaosExperiment', { lambdaFunction: chaosAgent });
 

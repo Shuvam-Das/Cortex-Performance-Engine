@@ -36,7 +36,7 @@ An intelligent, agentic system for ensuring the resilience and performance of th
     -   **Log Analysis**: Learns user behavior from application logs.
     -   **Script Generation**: Automatically creates complex JMeter test scripts.
     -   **Intelligent Reporting**: Correlates test results with server metrics to produce a report with actionable observations and recommendations.
--   **Chaos Engineering**: Injects failures (e.g., CPU stress, latency) into the live AWS environment to test system resilience, orchestrated via **AWS Systems Manager**.
+-   **Decoupled Notifications**: The pipeline publishes completion messages to an **Amazon SNS topic**, allowing any service (like email, Slack via n8n, or Jira) to subscribe and react to test results without being tightly coupled to the system.
 -   **Serverless & Cost-Optimized**: The entire platform runs on **AWS Step Functions**, **Lambda**, and **Fargate Spot**, ensuring minimal cost and zero server management.
 
 ---
@@ -67,4 +67,4 @@ On any push to the `main` branch, the `deploy.yml` pipeline will automatically:
 
  - **Live Status**: The **AWS Step Functions** console provides a real-time visual graph of the testing pipeline's execution.
  - **Live Logs**: All logs (from both the web app and the testing agents) are streamed to **Amazon CloudWatch** for live monitoring and querying with Logs Insights.
- - **Integration Endpoint**: After deployment, the public URL for the `n8n` service will be available in the CloudFormation outputs of the `PerformancePlatformStack`.
+ - **Notification Endpoint**: After deployment, the ARN for the `CortexNotificationsTopic` will be available in the CloudFormation outputs. You can subscribe your `n8n` webhook or an email address to this topic to receive test results automatically.
